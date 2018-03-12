@@ -3,7 +3,7 @@ import * as isEqual from "lodash.isequal";
 
 import { CognitoService, CognitoServiceOptions } from "./service";
 
-/*
+const styles = `
 .modal-error {
   border-radius: 0 !important;
   border-right: 0 !important;
@@ -16,7 +16,7 @@ import { CognitoService, CognitoServiceOptions } from "./service";
 button {
   cursor: pointer;
 }
-*/
+`;
 const log = require("debug")("csrm:view");
 
 export enum AuthState {
@@ -65,6 +65,11 @@ interface ModalProps {
 // bootstrap 4 modal helper
 const Modal = (props: ModalProps) => (
   <div className="modal" role="dialog">
+    <style
+      dangerouslySetInnerHTML={{
+        __html: styles
+      }}
+    />
     <div className="modal-dialog" role="document">
       <div className="modal-content">
         <div>

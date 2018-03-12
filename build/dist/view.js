@@ -13,20 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var isEqual = require("lodash.isequal");
 var service_1 = require("./service");
-/*
-.modal-error {
-  border-radius: 0 !important;
-  border-right: 0 !important;
-  border-left: 0 !important;
-}
-.modal {
-  display: block !important;
-  background: rgba(0, 0, 0, 0.3);
-}
-button {
-  cursor: pointer;
-}
-*/
+var styles = "\n.modal-error {\n  border-radius: 0 !important;\n  border-right: 0 !important;\n  border-left: 0 !important;\n}\n.modal {\n  display: block !important;\n  background: rgba(0, 0, 0, 0.3);\n}\nbutton {\n  cursor: pointer;\n}\n";
 var log = require("debug")("csrm:view");
 var AuthState;
 (function (AuthState) {
@@ -45,6 +32,9 @@ var Inputs;
 })(Inputs || (Inputs = {}));
 // bootstrap 4 modal helper
 var Modal = function (props) { return (React.createElement("div", { className: "modal", role: "dialog" },
+    React.createElement("style", { dangerouslySetInnerHTML: {
+            __html: styles
+        } }),
     React.createElement("div", { className: "modal-dialog", role: "document" },
         React.createElement("div", { className: "modal-content" },
             React.createElement("div", null,
