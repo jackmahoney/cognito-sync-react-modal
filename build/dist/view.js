@@ -103,9 +103,22 @@ var CognitoView = /** @class */ (function (_super) {
         var _a;
     };
     CognitoView.prototype.notifyAuthStateChange = function (state) {
+        var _this = this;
         if (this.props.onAuthStateChange) {
             this.props.onAuthStateChange(state);
         }
+        this.cognitoService
+            .getUserData()
+            .then(function (data) {
+            if (!isEqual(data, _this.props.syncData)) {
+                log("Data received on authChange is new, notifying parent");
+                _this.props.onSyncDataReceived(data);
+            }
+            else {
+                log("Data received on authChange is not new");
+            }
+        })
+            .catch(function (err) { return _this.props.onError(err); });
     };
     CognitoView.prototype.notifyInvalidInputs = function () {
         log("Invalid inputs");

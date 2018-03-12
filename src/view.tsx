@@ -145,6 +145,17 @@ export class CognitoView extends React.Component<CognitoProps, CognitoState> {
     if (this.props.onAuthStateChange) {
       this.props.onAuthStateChange(state);
     }
+    this.cognitoService
+      .getUserData()
+      .then(data => {
+        if (!isEqual(data, this.props.syncData)) {
+          log("Data received on authChange is new, notifying parent");
+          this.props.onSyncDataReceived(data);
+        } else {
+          log("Data received on authChange is not new");
+        }
+      })
+      .catch(err => this.props.onError(err));
   }
   notifyInvalidInputs() {
     log("Invalid inputs");
