@@ -1,6 +1,6 @@
 {
   "name": "cognito-sync-react-modal",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "A React modal for authenticating Cognito users and syncing data.",
   "main": "build/dist/index.js",
   "types": "build/dist/index.d.ts",
