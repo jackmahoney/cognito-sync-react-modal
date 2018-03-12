@@ -3,6 +3,20 @@ import * as isEqual from "lodash.isequal";
 
 import { CognitoService, CognitoServiceOptions } from "./service";
 
+/*
+.modal-error {
+  border-radius: 0 !important;
+  border-right: 0 !important;
+  border-left: 0 !important;
+}
+.modal {
+  display: block !important;
+  background: rgba(0, 0, 0, 0.3);
+}
+button {
+  cursor: pointer;
+}
+*/
 const log = require("debug")("csrm:view");
 
 export enum AuthState {
@@ -20,7 +34,7 @@ enum Inputs {
   password = "password"
 }
 
-interface CognitoState {
+export interface CognitoState {
   loading: boolean;
   authState: AuthState;
   jwtToken: string;

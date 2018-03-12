@@ -1,4 +1,4 @@
-.PHONY: build
+.PHONY: build test
 
 build:
 	npx tsc -p .

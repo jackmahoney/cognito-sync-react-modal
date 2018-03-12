@@ -13,6 +13,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var isEqual = require("lodash.isequal");
 var service_1 = require("./service");
+/*
+.modal-error {
+  border-radius: 0 !important;
+  border-right: 0 !important;
+  border-left: 0 !important;
+}
+.modal {
+  display: block !important;
+  background: rgba(0, 0, 0, 0.3);
+}
+button {
+  cursor: pointer;
+}
+*/
 var log = require("debug")("csrm:view");
 var AuthState;
 (function (AuthState) {

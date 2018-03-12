@@ -1,8 +1,10 @@
 {
   "name": "cognito-sync-react-modal",
   "version": "1.2.0",
-  "description": "A React modal for authenticating Cognito users and syncing data.",
+  "description":
+    "A React modal for authenticating Cognito users and syncing data.",
   "main": "build/dist/index.js",
+  "types": "build/dist/index.d.ts",
   "author": "jackmahoney",
   "license": "MIT",
   "dependencies": {
@@ -18,7 +20,8 @@
   "scripts": {
     "start": "",
     "build": "tsc -p .",
-    "test": "mocha --timeout 10000 --require ts-node/register --require jsdom-global/register --require mock-local-storage test/*.ts"
+    "test":
+      "mocha --timeout 10000 --require ts-node/register --require jsdom-global/register --require mock-local-storage test/*.ts"
   },
   "devDependencies": {
     "@types/chai": "^4.1.2",
