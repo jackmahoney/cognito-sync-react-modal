@@ -1,0 +1,38 @@
+{
+  "name": "cognito-sync-react-modal",
+  "version": "1.0.0",
+  "description":
+    "A React modal for authenticating Cognito users and syncing data.",
+  "main": "index.js",
+  "author": "jackmahoney",
+  "license": "MIT",
+  "dependencies": {
+    "amazon-cognito-identity-js": "^2.0.1",
+    "amazon-cognito-js": "^1.1.0",
+    "aws-sdk": "^2.206.0",
+    "debug": "^3.1.0",
+    "lodash.isequal": "^4.5.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "reactstrap": "^5.0.0-alpha.4"
+  },
+  "scripts": {
+    "start": "",
+    "test": "mocha -r ts-node/register test/*.ts"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "enzyme": "^3.3.0",
+    "mocha": "^5.0.4",
+    "@types/chai": "^4.1.2",
+    "@types/mocha": "^2.2.48",
+    "@types/reactstrap": "^5.0.8",
+    "@types/chai-as-promised": "^7.1.0",
+    "@types/node": "^8.5.5",
+    "@types/react": "^16.0.34",
+    "@types/react-dom": "^16.0.3",
+    "chai-as-promised": "^7.1.1",
+    "ts-node": "^5.0.1",
+    "typescript": "^2.7.2"
+  }
+}
