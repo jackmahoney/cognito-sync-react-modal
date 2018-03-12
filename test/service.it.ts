@@ -11,10 +11,27 @@ describe("cognito service", () => {
     },
     getCookie: () => cookie
   };
-  it("can initialize", () => {
+  it("can get empty data, save new data, get same data", () => {
+    const testData = {
+      a: 1,
+      b: "string"
+    };
     const service = new CognitoService(
       Object.assign(cognitoServiceOptions, functions)
     );
-    return service.getUserData().should.eventually.equal("foo");
+    return Promise.resolve()
+      .then(() => service.getUserData())
+      .then(data => expect(data).to.eql(undefined))
+      .then(() => service.putUserData(testData))
+      .then(data =>
+        expect(data.datasetName).to.eql(cognitoServiceOptions.datasetName)
+      )
+      .then(() => service.getUserData())
+      .then(data => {
+        expect(data).to.eql(testData);
+      })
+      .then(() => service.putUserData(Object.assign(testData, { b: "test" })))
+      .then(() => service.getUserData())
+      .then(data => expect(data.b).to.eql("test"));
   });
 });

@@ -57,11 +57,13 @@ export class CognitoService {
   }
 
   getUserData(): Promise<any> {
-    return this.getSyncValue(this.options.datasetKey);
+    return this.getSyncValue(this.options.datasetKey).then(
+      res => (res ? JSON.parse(res) : res)
+    );
   }
 
   putUserData(value: any) {
-    return this.putSyncValue(this.options.datasetKey, value);
+    return this.putSyncValue(this.options.datasetKey, JSON.stringify(value));
   }
 
   private getSyncClient() {

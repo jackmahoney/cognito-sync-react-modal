@@ -31,7 +31,7 @@ interface CognitoState {
   inputs: { any: string } | {};
 }
 
-interface CognitoProps {
+export interface CognitoProps {
   appName: string;
   cognitoOptions: CognitoServiceOptions;
   onAuthStateChange?: (a: AuthState) => void;
