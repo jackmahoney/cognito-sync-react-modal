@@ -40,19 +40,12 @@ export class CognitoService {
         window.localStorage.removeItem(options.cookieName);
       }
     };
-
     this.options = Object.assign(defaultOptions, options);
 
     this.poolData = {
-      UserPoolId: options.awsUserPoolId,
-      ClientId: options.awsClientId
+      UserPoolId: this.options.awsUserPoolId,
+      ClientId: this.options.awsClientId
     };
-
-    AWS.config.region = options.awsRegion;
-    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-      IdentityPoolId: options.awsIdentityPoolId
-    });
-
     this.userPool = new CognitoUserPool(this.poolData);
   }
 
@@ -67,6 +60,17 @@ export class CognitoService {
   }
 
   private getSyncClient() {
+    const loginId = this.getStoredAccessToken();
+    if (!loginId) {
+      throw "No loginId found";
+    }
+
+    AWS.config.region = this.options.awsRegion;
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: this.options.awsIdentityPoolId,
+      LoginId: loginId
+    });
+
     return this.syncClient
       ? Promise.resolve(this.syncClient)
       : new Promise((res, rej) => {
