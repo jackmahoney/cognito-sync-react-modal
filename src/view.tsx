@@ -117,9 +117,11 @@ export class CognitoView extends React.Component<CognitoProps, CognitoState> {
     const storedToken = this.cognitoService.getStoredAccessToken();
     if (!storedToken) {
       const authState = AuthState.Anonymous;
+      log(`No stored token, state is ${authState}`);
       this.setState({ authState }, () => this.notifyAuthStateChange(authState));
     } else {
       const authState = AuthState.LoggedIn;
+      log(`Stored token, state is ${authState}`);
       this.setState({ jwtToken: storedToken, authState }, () =>
         this.notifyAuthStateChange(authState)
       );
@@ -128,9 +130,12 @@ export class CognitoView extends React.Component<CognitoProps, CognitoState> {
   componentWillReceiveProps(nextProps: CognitoProps) {
     // if the sync data is different, lets update it via cognito
     if (!isEqual(this.props.syncData, nextProps.syncData)) {
+      log("Component received unequal syncData, putting to store");
       this.cognitoService
-        .putUserData(nextProps)
+        .putUserData(nextProps.syncData)
         .catch(err => this.props.onError(err));
+    } else {
+      log("Component received equal syncData, ignoing");
     }
   }
   handleInputChange(event: any) {
@@ -224,15 +229,9 @@ export class CognitoView extends React.Component<CognitoProps, CognitoState> {
   resendVerificationCode() {
     return null;
   }
-  showLogin() {
-    this.setState({ authState: AuthState.HasAccount });
-  }
-  showSignup() {
-    this.setState({ authState: AuthState.Anonymous });
-  }
-  showVerify() {
-    this.setState({ authState: AuthState.Unverified });
-  }
+  showLogin = () => this.setState({ authState: AuthState.HasAccount });
+  showSignup = () => this.setState({ authState: AuthState.Anonymous });
+  showVerify = () => this.setState({ authState: AuthState.Unverified });
   getInput(type: string, placeholder: string, name: string) {
     return (
       <div className="form-group">

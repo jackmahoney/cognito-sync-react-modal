@@ -12,8 +12,9 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var isEqual = require("lodash.isequal");
+var reactstrap_1 = require("reactstrap");
 var service_1 = require("./service");
-var styles = "\n.modal-error {\n  border-radius: 0 !important;\n  border-right: 0 !important;\n  border-left: 0 !important;\n}\n.modal {\n  display: block !important;\n  background: rgba(0, 0, 0, 0.3);\n}\nbutton {\n  cursor: pointer;\n}\n";
+var styles = "\n.modal-error {\n  border-radius: 0 !important;\n  border-right: 0 !important;\n  border-left: 0 !important;\n}\n.cognito-modal button {\n  cursor: pointer;\n}\n";
 var log = require("debug")("csrm:view");
 var AuthState;
 (function (AuthState) {
@@ -31,24 +32,23 @@ var Inputs;
     Inputs["password"] = "password";
 })(Inputs || (Inputs = {}));
 // bootstrap 4 modal helper
-var Modal = function (props) { return (React.createElement("div", { className: "modal", role: "dialog" },
+var CognitoModal = function (props) { return (React.createElement(reactstrap_1.Modal, { isOpen: true, className: "cognito-modal" },
     React.createElement("style", { dangerouslySetInnerHTML: {
             __html: styles
         } }),
-    React.createElement("div", { className: "modal-dialog", role: "document" },
-        React.createElement("div", { className: "modal-content" },
-            React.createElement("div", null,
-                React.createElement("div", { className: "modal-header bg-light" },
-                    React.createElement("h5", { className: "modal-title" }, props.title)),
-                props.error && (React.createElement("div", { className: "alert alert-danger modal-error mb-0" }, props.error)),
-                React.createElement("div", { className: "modal-body" },
-                    React.createElement("i", { className: "fas fa-spinner d-none" }),
-                    props.loading ? (React.createElement("i", { className: "fas fa-spinner fa-pulse fa-5x text-primary text-center w100 d-block py-3 m-0" })) : (props.body)),
-                React.createElement("div", { className: "modal-footer" }, props.footer)))))); };
+    React.createElement(reactstrap_1.ModalHeader, null, props.title),
+    props.error && (React.createElement("div", { className: "alert alert-danger modal-error mb-0" }, props.error)),
+    React.createElement(reactstrap_1.ModalBody, null,
+        React.createElement("i", { className: "fas fa-spinner d-none" }),
+        props.loading ? (React.createElement("i", { className: "fas fa-spinner fa-pulse fa-5x text-primary text-center w100 d-block py-3 m-0" })) : (props.body)),
+    React.createElement(reactstrap_1.ModalFooter, null, props.footer))); };
 var CognitoView = /** @class */ (function (_super) {
     __extends(CognitoView, _super);
     function CognitoView(props) {
         var _this = _super.call(this, props) || this;
+        _this.showLogin = function () { return _this.setState({ authState: AuthState.HasAccount }); };
+        _this.showSignup = function () { return _this.setState({ authState: AuthState.Anonymous }); };
+        _this.showVerify = function () { return _this.setState({ authState: AuthState.Unverified }); };
         _this.onKeyDown = function (event, callback) {
             // 'keypress' event misbehaves on mobile so we track 'Enter' key via 'keydown' event
             if (event.key === "Enter") {
@@ -76,10 +76,12 @@ var CognitoView = /** @class */ (function (_super) {
         var storedToken = this.cognitoService.getStoredAccessToken();
         if (!storedToken) {
             var authState_1 = AuthState.Anonymous;
+            log("No stored token, state is " + authState_1);
             this.setState({ authState: authState_1 }, function () { return _this.notifyAuthStateChange(authState_1); });
         }
         else {
             var authState_2 = AuthState.LoggedIn;
+            log("Stored token, state is " + authState_2);
             this.setState({ jwtToken: storedToken, authState: authState_2 }, function () {
                 return _this.notifyAuthStateChange(authState_2);
             });
@@ -89,9 +91,13 @@ var CognitoView = /** @class */ (function (_super) {
         var _this = this;
         // if the sync data is different, lets update it via cognito
         if (!isEqual(this.props.syncData, nextProps.syncData)) {
+            log("Component received unequal syncData, putting to store");
             this.cognitoService
-                .putUserData(nextProps)
+                .putUserData(nextProps.syncData)
                 .catch(function (err) { return _this.props.onError(err); });
+        }
+        else {
+            log("Component received equal syncData, ignoing");
         }
     };
     CognitoView.prototype.handleInputChange = function (event) {
@@ -179,15 +185,6 @@ var CognitoView = /** @class */ (function (_super) {
     CognitoView.prototype.resendVerificationCode = function () {
         return null;
     };
-    CognitoView.prototype.showLogin = function () {
-        this.setState({ authState: AuthState.HasAccount });
-    };
-    CognitoView.prototype.showSignup = function () {
-        this.setState({ authState: AuthState.Anonymous });
-    };
-    CognitoView.prototype.showVerify = function () {
-        this.setState({ authState: AuthState.Unverified });
-    };
     CognitoView.prototype.getInput = function (type, placeholder, name) {
         var _this = this;
         return (React.createElement("div", { className: "form-group" },
@@ -248,7 +245,7 @@ var CognitoView = /** @class */ (function (_super) {
             React.createElement("a", { href: "#", onClick: function () { return _this.resendVerificationCode(); } }, "resend verification code"),
             "."));
         // modal render helper
-        var getModal = function (title, body, footer) { return (React.createElement(Modal, { loading: _this.state.loading, error: _this.state.error, title: title, body: body, footer: footer })); };
+        var getModal = function (title, body, footer) { return (React.createElement(CognitoModal, { loading: _this.state.loading, error: _this.state.error, title: title, body: body, footer: footer })); };
         // render logic
         switch (this.state.authState) {
             case AuthState.Anonymous:

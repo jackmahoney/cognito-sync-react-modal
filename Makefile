@@ -1,5 +1,8 @@
 .PHONY: build test
 
+view:
+	npx webpack && open test/view.html
+
 build:
 	npx tsc -p .
 

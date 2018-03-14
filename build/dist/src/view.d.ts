@@ -41,9 +41,9 @@ export declare class CognitoView extends React.Component<CognitoProps, CognitoSt
     onVerify(): void;
     performCognitoAction(action: Promise<any>, nextAuthState: AuthState): void;
     resendVerificationCode(): any;
-    showLogin(): void;
-    showSignup(): void;
-    showVerify(): void;
+    showLogin: () => void;
+    showSignup: () => void;
+    showVerify: () => void;
     getInput(type: string, placeholder: string, name: string): JSX.Element;
     onKeyDown: (event: any, callback: () => void) => void;
     getForm(inputs: any[], primaryOnClick: () => void, primaryLabel: string): JSX.Element;
