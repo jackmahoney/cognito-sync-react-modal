@@ -1,28 +1,62 @@
 import "mocha";
 import { expect } from "chai";
-import { cognitoServiceOptions } from "./config";
+import { cognitoServiceOptions, users, mailSlurpApiKey } from "./config";
 import { CognitoService, CognitoServiceOptions } from "../src/service";
 
+// integration test cognito sign up using free MailSlurp API
+const MailSlurpClient = require("mailslurp-client");
+const mailSlurp = new MailSlurpClient.InboxcontrollerApi();
+
 describe("cognito service", () => {
-  let cookie = "";
-  const functions = {
-    setCookie: (s: string) => {
-      cookie = s;
-    },
-    getCookie: () => cookie
-  };
-  it("can get empty data, save new data, get same data", () => {
+  it("can sign up, get empty data, save new data, get same data", function() {
+    this.timeout(60000);
     const testData = {
       a: 1,
       b: "string"
     };
-    const service = new CognitoService(
-      Object.assign(cognitoServiceOptions, functions)
-    );
+    const service = new CognitoService(cognitoServiceOptions);
+    let username;
+    let emailAddress;
+    const password = "Test123!";
     return Promise.resolve()
       .then(() => service.getUserData())
       .catch(err => expect(err).to.contain("No loginId found"))
-      .then(() => functions.setCookie("test-cookie-value"))
+      .then(() => mailSlurp.createRandomInboxUsingPOST(mailSlurpApiKey))
+      .then(
+        data => data.payload,
+        err => {
+          throw err;
+        }
+      )
+      .then(({ id, address }) => {
+        username = id;
+        emailAddress = address;
+        expect(username).to.eq(id);
+        return service.signUp(username, emailAddress, password);
+      })
+      .then(() => {
+        return mailSlurp
+          .getEmailsForInboxUsingGET(mailSlurpApiKey, username, {
+            minCount: 1,
+            maxWait: 90
+          })
+          .then(
+            data => data.payload,
+            err => {
+              throw err;
+            }
+          )
+          .then(([latestEmail]) => {
+            // regex match for the confirmation code
+            // within the email body
+            const r = /\s(\d{6})\./g;
+            // extract the verication code
+            const verificationCode = r.exec(latestEmail.body)[1];
+            return verificationCode;
+          });
+      })
+      .then(verificationCode => service.verifyUser(username, verificationCode))
+      .then(() => service.login(username, password))
       .then(() => service.getUserData())
       .then(data => expect(data).to.eql(undefined))
       .then(() => service.putUserData(testData))
@@ -37,20 +71,8 @@ describe("cognito service", () => {
       .then(() => service.getUserData())
       .then(data => expect(data.b).to.eql("test"));
   });
-  it("can save two different datasets", () => {
-    const users = {
-      user1: {
-        username: "test2",
-        password: "Admin123!"
-      },
-      user2: {
-        username: "test3",
-        password: "Admin123!"
-      }
-    };
-    const service = new CognitoService(
-      Object.assign(cognitoServiceOptions, functions)
-    );
+  it("can save two different datasets with existing users", () => {
+    const service = new CognitoService(cognitoServiceOptions);
     let data1 = 0;
     let data2 = 0;
     return (

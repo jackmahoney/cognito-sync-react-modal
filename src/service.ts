@@ -16,10 +16,23 @@ export interface CognitoServiceOptions {
   awsClientId: string;
   datasetName: string;
   datasetKey: string;
-  cookieName: string;
-  getCookie?: () => string;
-  clearCookie?: () => void;
-  setCookie?: (s: string) => void;
+}
+
+enum StorageKey {
+  accessToken = "csrm:access-token",
+  username = "csrm:username"
+}
+
+class Storage {
+  static getValue(key: string): string {
+    return window.localStorage.getItem(key);
+  }
+  static setValue(key: string, value: string) {
+    window.localStorage.setItem(key, value);
+  }
+  static clearAll() {
+    window.localStorage.clear();
+  }
 }
 
 export class CognitoService {
@@ -29,24 +42,17 @@ export class CognitoService {
   private options: CognitoServiceOptions;
 
   constructor(options: CognitoServiceOptions) {
-    const defaultOptions = {
-      getCookie() {
-        window.localStorage.getItem(options.cookieName);
-      },
-      setCookie(value: string) {
-        window.localStorage.setItem(options.cookieName, value);
-      },
-      clearCookie() {
-        window.localStorage.removeItem(options.cookieName);
-      }
-    };
-    this.options = Object.assign(defaultOptions, options);
+    this.options = options;
 
     this.poolData = {
       UserPoolId: this.options.awsUserPoolId,
       ClientId: this.options.awsClientId
     };
     this.userPool = new CognitoUserPool(this.poolData);
+  }
+
+  getStoredAccessToken() {
+    return Storage.getValue(StorageKey.accessToken);
   }
 
   getUserData(): Promise<any> {
@@ -60,7 +66,7 @@ export class CognitoService {
   }
 
   private getSyncClient() {
-    const loginId = this.getStoredAccessToken();
+    const loginId = Storage.getValue(StorageKey.username);
     if (!loginId) {
       throw "No loginId found";
     }
@@ -142,13 +148,9 @@ export class CognitoService {
 
   logout(): Promise<any> {
     return new Promise((res, rej) => {
-      this.options.clearCookie();
+      Storage.clearAll();
       res();
     });
-  }
-
-  getStoredAccessToken() {
-    return this.options.getCookie();
   }
 
   login(username: string, password: string): Promise<string> {
@@ -168,7 +170,9 @@ export class CognitoService {
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: (result: any) => {
           const accessToken = result.getAccessToken().getJwtToken();
-          this.options.setCookie(accessToken);
+          // store username and accessToken in localStorage
+          Storage.setValue(StorageKey.accessToken, accessToken);
+          Storage.setValue(StorageKey.username, username);
           res(accessToken);
         },
 

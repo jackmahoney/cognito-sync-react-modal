@@ -12,6 +12,7 @@
     "aws-sdk": "^2.206.0",
     "debug": "^3.1.0",
     "lodash.isequal": "^4.5.0",
+    "mailslurp-client": "^0.1.1514850454",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-transition-group": "^2.2.1"
