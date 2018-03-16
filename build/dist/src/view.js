@@ -12,9 +12,8 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var isEqual = require("lodash.isequal");
-var reactstrap_1 = require("reactstrap");
 var service_1 = require("./service");
-var styles = "\n.modal-error {\n  border-radius: 0 !important;\n  border-right: 0 !important;\n  border-left: 0 !important;\n}\n.cognito-modal button {\n  cursor: pointer;\n}\n";
+var styles = "\n.modal-error {\n  border-radius: 0 !important;\n  border-right: 0 !important;\n  border-left: 0 !important;\n}\n.modal {\n  display: block !important;\n  background: rgba(0, 0, 0, 0.3);\n}\nbutton {\n  cursor: pointer;\n}\n";
 var log = require("debug")("csrm:view");
 var AuthState;
 (function (AuthState) {
@@ -32,16 +31,20 @@ var Inputs;
     Inputs["password"] = "password";
 })(Inputs || (Inputs = {}));
 // bootstrap 4 modal helper
-var CognitoModal = function (props) { return (React.createElement(reactstrap_1.Modal, { isOpen: true, className: "cognito-modal" },
+var Modal = function (props) { return (React.createElement("div", { className: "modal", role: "dialog" },
     React.createElement("style", { dangerouslySetInnerHTML: {
             __html: styles
         } }),
-    React.createElement(reactstrap_1.ModalHeader, null, props.title),
-    props.error && (React.createElement("div", { className: "alert alert-danger modal-error mb-0" }, props.error)),
-    React.createElement(reactstrap_1.ModalBody, null,
-        React.createElement("i", { className: "fas fa-spinner d-none" }),
-        props.loading ? (React.createElement("i", { className: "fas fa-spinner fa-pulse fa-5x text-primary text-center w100 d-block py-3 m-0" })) : (props.body)),
-    React.createElement(reactstrap_1.ModalFooter, null, props.footer))); };
+    React.createElement("div", { className: "modal-dialog", role: "document" },
+        React.createElement("div", { className: "modal-content" },
+            React.createElement("div", null,
+                React.createElement("div", { className: "modal-header bg-light" },
+                    React.createElement("h5", { className: "modal-title" }, props.title)),
+                props.error && (React.createElement("div", { className: "alert alert-danger modal-error mb-0" }, props.error)),
+                React.createElement("div", { className: "modal-body" },
+                    React.createElement("i", { className: "fas fa-spinner d-none" }),
+                    props.loading ? (React.createElement("i", { className: "fas fa-spinner fa-pulse fa-5x text-primary text-center w100 d-block py-3 m-0" })) : (props.body)),
+                React.createElement("div", { className: "modal-footer" }, props.footer)))))); };
 var CognitoView = /** @class */ (function (_super) {
     __extends(CognitoView, _super);
     function CognitoView(props) {
@@ -113,18 +116,21 @@ var CognitoView = /** @class */ (function (_super) {
         if (this.props.onAuthStateChange) {
             this.props.onAuthStateChange(state);
         }
-        this.cognitoService
-            .getUserData()
-            .then(function (data) {
-            if (!isEqual(data, _this.props.syncData)) {
-                log("Data received on authChange is new, notifying parent");
-                _this.props.onSyncDataReceived(data);
-            }
-            else {
-                log("Data received on authChange is not new");
-            }
-        })
-            .catch(function (err) { return _this.props.onError(err); });
+        if (this.state.authState === AuthState.LoggedIn) {
+            log("State is LoggedIn, fetching user data");
+            this.cognitoService
+                .getUserData()
+                .then(function (data) {
+                if (!isEqual(data, _this.props.syncData)) {
+                    log("Data received on authChange is new, notifying parent");
+                    _this.props.onSyncDataReceived(data);
+                }
+                else {
+                    log("Data received on authChange is not new");
+                }
+            })
+                .catch(function (err) { return _this.props.onError(err); });
+        }
     };
     CognitoView.prototype.notifyInvalidInputs = function () {
         log("Invalid inputs");
@@ -245,7 +251,7 @@ var CognitoView = /** @class */ (function (_super) {
             React.createElement("a", { href: "#", onClick: function () { return _this.resendVerificationCode(); } }, "resend verification code"),
             "."));
         // modal render helper
-        var getModal = function (title, body, footer) { return (React.createElement(CognitoModal, { loading: _this.state.loading, error: _this.state.error, title: title, body: body, footer: footer })); };
+        var getModal = function (title, body, footer) { return (React.createElement(Modal, { loading: _this.state.loading, error: _this.state.error, title: title, body: body, footer: footer })); };
         // render logic
         switch (this.state.authState) {
             case AuthState.Anonymous:

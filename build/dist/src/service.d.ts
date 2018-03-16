@@ -5,10 +5,6 @@ export interface CognitoServiceOptions {
     awsClientId: string;
     datasetName: string;
     datasetKey: string;
-    cookieName: string;
-    getCookie?: () => string;
-    clearCookie?: () => void;
-    setCookie?: (s: string) => void;
 }
 export declare class CognitoService {
     private poolData;
@@ -16,6 +12,7 @@ export declare class CognitoService {
     private syncClient;
     private options;
     constructor(options: CognitoServiceOptions);
+    getStoredAccessToken(): string;
     getUserData(): Promise<any>;
     putUserData(value: any): Promise<any>;
     private getSyncClient();
@@ -23,7 +20,6 @@ export declare class CognitoService {
     getSyncValue(key: string): Promise<any>;
     putSyncValue(key: string, value: any): Promise<any>;
     logout(): Promise<any>;
-    getStoredAccessToken(): string;
     login(username: string, password: string): Promise<string>;
     verifyUser(username: string, code: string): Promise<{}>;
     signUp(username: string, email: string, password: string): Promise<string>;
